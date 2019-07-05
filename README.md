@@ -65,3 +65,8 @@ sjq -a 'root.subclass.ids.filter(id => id > 22)' -j '{ "subclass": { "name": "Ho
 ```bash
 echo '{ "subclass": { "name": "Ho", "ids": [22, 23, 24]  }}' | sjq -a 'root.subclass.ids.filter(id => id > 22)'
 ```
+
+## Planned features
+
+* support subclasses with the same name with different value types
+* interactive mode with auto complete on json
