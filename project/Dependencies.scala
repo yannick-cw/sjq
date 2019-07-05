@@ -1,26 +1,27 @@
 import sbt._
 
 object Versions {
-  val circe   = "0.11.0"
-  val refined = "0.9.4"
+  val circe         = "0.12.0-M4"
+  val caseApp       = "2.0.0-M9"
+  val scalaTest     = "3.0.8"
+  val scalaCompiler = "2.13.0"
 }
 
 object Dependencies {
-  val caseApp        = "com.github.alexarchambault" %% "case-app"       % "2.0.0-M6"
-  val logbackClassic = "ch.qos.logback"             % "logback-classic" % "1.2.3"
-  val scalaTest      = "org.scalatest"              %% "scalatest"      % "3.0.7"
+  val caseApp   = "com.github.alexarchambault" %% "case-app"  % Versions.caseApp
+  val scalaTest = "org.scalatest"              %% "scalatest" % Versions.scalaTest
 
-  lazy val circe = Seq(
+  val circe = Seq(
     "io.circe" %% "circe-core",
     "io.circe" %% "circe-generic",
     "io.circe" %% "circe-parser",
-    "io.circe" %% "circe-optics"
   ).map(_ % Versions.circe)
+
+  val scalaCompiler = "org.scala-lang" % "scala-compiler" % Versions.scalaCompiler
 
   val dependencies = Seq(
     caseApp,
-    logbackClassic,
-    scalaTest       % "test",
-    "org.scalameta" %% "scalameta" % "4.1.9",
+    scalaTest % "test,it",
+    scalaCompiler,
   ) ++ circe
 }
