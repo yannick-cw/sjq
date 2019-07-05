@@ -20,6 +20,25 @@ sjq -a 'root.subclass.copy(name = root.subclass.name + "Jo")' -j '{ "subclass": 
 }
 ```
 
+One example with a more complex json and a remote api:
+
+##### Get all hotel names with a score over 300
+
+```
+curl https://www.holidaycheck.de/svc/search-api/search/mall\?tenant\=test \
+| sjq -a 'root.destinations.entities.filter(_.rankingScore > 300).map(_.name)'
+```
+
+give
+
+```
+[
+  "Mallorca",
+  "Malles Venosta / Mals",
+  "Palma de Mallorca"
+]
+```
+
 ## Install 
 
 `brew install yannick-cw/homebrew-tap/sjq`
