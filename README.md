@@ -29,7 +29,7 @@ curl https://www.holidaycheck.de/svc/search-api/search/mall\?tenant\=test \
 | sjq -a 'root.destinations.entities.filter(_.rankingScore > 300).map(_.name)'
 ```
 
-give
+returns
 
 ```
 [
