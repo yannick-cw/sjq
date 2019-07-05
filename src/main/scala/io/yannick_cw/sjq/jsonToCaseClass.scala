@@ -9,6 +9,7 @@ object jsonToCaseClass {
     val (_, allCCs) = buildCC(j, "CC", List.empty)
     val ccs =
       allCCs
+        // todo this is just a hack to get around duplicated nested objects
         .distinctBy(_.name)
         .map(cc => cc.copy(content = cc.content.filter { case (key, value) => key.nonEmpty && value.nonEmpty }))
 
