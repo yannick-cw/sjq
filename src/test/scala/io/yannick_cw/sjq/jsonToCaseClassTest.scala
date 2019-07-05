@@ -65,7 +65,7 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
                        | }
                      """.stripMargin).fold(throw _, x => x)
 
-    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(names: List[Any])"))
+    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(names: List[String])"))
   }
 
   it should "parse json with nested objects in arrays" in {
