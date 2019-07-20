@@ -55,7 +55,7 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
                        | }
                      """.stripMargin).fold(throw _, x => x)
 
-    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(name: Option[Any])"))
+    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(name: Option[String])"))
   }
 
   it should "parse json empty lists" in {
@@ -118,9 +118,27 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
 
     jsonToCaseClass(json) shouldBe List(
       ("CC", "case class CC(sub: sub, another: another)"),
+      ("another", "case class another(double: double1)"),
+      ("double1", "case class double1(xx: String)"),
       ("sub", "case class sub(double: double)"),
       ("double", "case class double(xx: String)"),
-      ("another", "case class another(double: double)"),
+    )
+  }
+
+  it should "parse json with the same name but different structures" in {
+    val json = parse("""
+                       | {
+                       |   "sub": { "double": { "xx": 22 } },
+                       |   "another": { "double": { "xx": "sds" } }
+                       | }
+                     """.stripMargin).fold(throw _, x => x)
+
+    jsonToCaseClass(json) shouldBe List(
+      ("CC", "case class CC(sub: sub, another: another)"),
+      ("another", "case class another(double: double1)"),
+      ("double1", "case class double1(xx: String)"),
+      ("sub", "case class sub(double: double)"),
+      ("double", "case class double(xx: Double)"),
     )
   }
 }
