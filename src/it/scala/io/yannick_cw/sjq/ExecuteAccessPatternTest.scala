@@ -2,8 +2,11 @@ package io.yannick_cw.sjq
 
 import io.circe.parser.parse
 import org.scalatest.{FlatSpec, Matchers}
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import io.circe._
+import io.circe.testing.instances._
 
-class ExecuteAccessPatternTest extends FlatSpec with Matchers {
+class ExecuteAccessPatternTest extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   it should "work for complex json" in {
     (for {
@@ -11,6 +14,18 @@ class ExecuteAccessPatternTest extends FlatSpec with Matchers {
       expected  <- parse(complexJson)
       parsedRes <- parse(res)
     } yield parsedRes shouldBe expected).fold(throw _, x => x)
+  }
+
+  ignore should "work for all json" in {
+    forAll { json: Json =>
+      whenever(json.isObject) {
+        (for {
+          res <- executeAccessPattern("root", json.spaces2)
+          expected = json
+          parsedRes <- parse(res)
+        } yield parsedRes shouldBe expected).fold(throw _, x => x)
+      }
+    }
   }
 
   val complexJson = """
