@@ -1,7 +1,11 @@
 package io.yannick_cw.sjq
 
+import cats.instances.map.catsKernelStdMonoidForMap
+import cats.instances.int.catsKernelStdGroupForInt
+import cats.syntax.foldable._
+import cats.instances.list._
+import cats.kernel.Semigroup
 import io.circe.Json
-import cats.implicits._
 
 object jsonToCaseClass {
   case class CC(name: String, content: Map[String, String])
@@ -17,13 +21,12 @@ object jsonToCaseClass {
   private def renderCC(cc: CC): String =
     s"case class ${cc.name}(${cc.content.map { case (key, value) => s"$key: $value" }.mkString(", ")})"
 
-  private def buildCC(j: Json, nextLevelName: String, doneCCs: List[CC]): (String, List[CC]) = {
+  private def buildCC(j: Json, nextLevelName: String, doneCCs: List[CC]): (Option[String], List[CC]) = {
     j.fold(
-      // todo decode not at all if null
-      "Option[String]" -> doneCCs,
-      _ => "Boolean" -> doneCCs,
-      _ => "Double"  -> doneCCs,
-      _ => "String"  -> doneCCs,
+      Some("Null") -> doneCCs,
+      _ => Some("Boolean") -> doneCCs,
+      _ => Some("Double")  -> doneCCs,
+      _ => Some("String")  -> doneCCs,
       array =>
         array.toList match {
           case all @ ele :: rest if all.forall(_.isObject) =>
@@ -32,15 +35,16 @@ object jsonToCaseClass {
                 case ((newValueName, aggCCs), nextJson) =>
                   newValueName -> buildCC(nextJson, nextLevelName, aggCCs)._2
               }
-
             val (valueName, ccs) = innerType match {
-              case (valueName, Nil)        => valueName -> doneCCs
-              case (valueName, ele :: Nil) => valueName -> (ele :: Nil)
-              case (valueName, ele :: more) =>
+              case (Some(valueName), Nil)        => valueName -> doneCCs
+              case (Some(valueName), ele :: Nil) => valueName -> (ele :: Nil)
+              case (Some(valueName), ele :: more) =>
                 val (nextLevelCCs, otherCCs) = (ele :: more)
                   .partition(_.name.startsWith(valueName))
 
-                val allContent = nextLevelCCs.map(_.content).fold(Map.empty)(_ ++ _)
+                implicit val sSemi: Semigroup[String] =
+                  (x: String, y: String) => if (x == "Null") s"Option[$y]" else if (y == "Null") s"Option[$x]" else x
+                val allContent = nextLevelCCs.map(_.content).combineAll
                 val keyCountPerContent =
                   nextLevelCCs.map(cc => cc.content.map[String, Int] { case (key, _) => (key, 1) }).combineAll
 
@@ -51,22 +55,23 @@ object jsonToCaseClass {
                   case (key, _)                          => key -> s"Option[${allContent(key)}]"
                 }))
                 valueName -> (newCC :: otherCCs)
+              case _ => "" -> doneCCs
             }
 
-            s"List[$valueName]" -> ccs
+            Some(s"List[$valueName]") -> ccs
           case ele :: rest if rest.forall(_ == ele) =>
             val (newValue, allCCs) = buildCC(ele, nextLevelName, doneCCs)
-            s"List[$newValue]" -> allCCs
-          case _ => "List[String]" -> doneCCs
+            newValue.map(v => s"List[$v]") -> allCCs
+          case _ => Some("List[String]") -> doneCCs
       },
       jObj => {
         val (allNewCCs, newCC) = jObj.toMap.foldLeft(doneCCs -> CC(nextLevelName, Map.empty)) {
           case ((allCCs, currCC), (key, value)) =>
             val safeNextLevelName     = findFreeName(currCC :: allCCs, key)
             val (newValue, allNewCCs) = buildCC(value, safeNextLevelName, allCCs)
-            (allNewCCs, currCC.copy(content = currCC.content.updated(key, newValue)))
+            allNewCCs -> newValue.map(v => currCC.copy(content = currCC.content.updated(key, v))).getOrElse(currCC)
         }
-        (nextLevelName, newCC :: allNewCCs)
+        (Some(nextLevelName), newCC :: allNewCCs)
       }
     )
   }

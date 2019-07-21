@@ -51,11 +51,26 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
   it should "parse json with null values" in {
     val json = parse("""
                        | {
-                       |   "name": null
+                       |   "name": null,
+                       |   "id": 22
                        | }
                      """.stripMargin).fold(throw _, x => x)
 
-    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(name: Option[String])"))
+    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(name: Null, id: Double)"))
+  }
+
+  it should "parse json with null values and not null values for a field" in {
+    val json = parse("""
+                       | {
+                       |   "things": [
+                       |     { "id": null },
+                       |     { "id": 22 }
+                       |   ]
+                       | }
+                     """.stripMargin).fold(throw _, x => x)
+
+    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(things: List[things])"),
+                                        ("things", "case class things(id: Option[Double])"))
   }
 
   it should "parse json empty lists" in {

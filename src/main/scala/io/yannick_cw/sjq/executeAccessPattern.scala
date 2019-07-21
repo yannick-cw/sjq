@@ -10,7 +10,9 @@ import scala.util.Try
 object executeAccessPattern {
   private def buildCode(access: String, ccs: String) =
     s"""
-       | import io.circe.Json
+       | import io.circe.{Encoder, Decoder, HCursor, Json}
+       | implicit val dec: Decoder[Null] = (c: HCursor) => Right(null)
+       | implicit val enc: Encoder[Null] = (_: Null) => Json.Null
        |
        | (json: Json) => {
        |  import io.circe.generic.auto._
