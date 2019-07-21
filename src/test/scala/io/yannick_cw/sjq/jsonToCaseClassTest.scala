@@ -156,4 +156,26 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
       ("double", "case class double(xx: Double)"),
     )
   }
+
+  //todo
+  ignore should "work for top level jsons" in {
+    val json = parse("22").fold(throw _, x => x)
+
+    jsonToCaseClass(json) shouldBe List(
+      ("CC", "Double")
+    )
+  }
+
+  //todo
+  ignore should "work for different types in an array" in {
+    val json = parse("""
+                       | {
+                       |   "list": [ 22, "Hi", false ]
+                       | }
+                     """.stripMargin).fold(throw _, x => x)
+
+    jsonToCaseClass(json) shouldBe List(
+      ("CC", "case class CC(list: List[Any])")
+    )
+  }
 }
