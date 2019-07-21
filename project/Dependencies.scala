@@ -11,7 +11,6 @@ object Versions {
 object Dependencies {
   val caseApp       = "com.github.alexarchambault"   %% "case-app"   % Versions.caseApp
   val scalaTest     = "org.scalatest"                %% "scalatest"  % Versions.scalaTest
-  val scalaTestPlus = "org.scalatestplus.scalacheck" %% "scalatest"  % Versions.scalaTest
   val scalaCheck    = "org.scalacheck"               %% "scalacheck" % Versions.scalaCheck % "it"
 
   val circe = Seq(
@@ -25,7 +24,6 @@ object Dependencies {
   val dependencies = Seq(
     caseApp,
     scalaTest     % "test,it",
-    scalaTestPlus % "test,it",
     scalaCompiler,
     scalaCheck
   ) ++ circe
