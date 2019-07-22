@@ -25,6 +25,16 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
     jsonToCaseClass(json) shouldBe List(("CC", "case class CC(names: List[String])"))
   }
 
+  it should "parse json with number arrays" in {
+    val json = parse("""
+                       | {
+                       |   "ids": [22, 23]
+                       | }
+                     """.stripMargin).fold(throw _, x => x)
+
+    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(ids: List[Double])"))
+  }
+
   it should "parse json with nested json objects" in {
     val json = parse("""
                        | {

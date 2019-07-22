@@ -59,9 +59,10 @@ object jsonToCaseClass {
             }
 
             Some(s"List[$valueName]") -> ccs
-          case ele :: rest if rest.forall(_ == ele) =>
+          case ele :: _ =>
             val (newValue, allCCs) = buildCC(ele, nextLevelName, doneCCs)
             newValue.map(v => s"List[$v]") -> allCCs
+            // todo fix if things have different types
           case _ => Some("List[String]") -> doneCCs
       },
       jObj => {

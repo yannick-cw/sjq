@@ -8,6 +8,16 @@ import io.circe.testing.instances._
 
 class ExecuteAccessPatternTest extends FlatSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
+  it should "work for json" in {
+    val testJson = """{ "subclass": { "ids": [22, 23, 24] }}"""
+
+    (for {
+      res       <- executeAccessPattern("root", testJson)
+      expected  <- parse(testJson)
+      parsedRes <- parse(res)
+    } yield parsedRes shouldBe expected).fold(throw _, x => x)
+  }
+
   it should "work for complex json" in {
     (for {
       res       <- executeAccessPattern("root", complexJson)
