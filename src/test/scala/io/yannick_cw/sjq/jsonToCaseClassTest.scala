@@ -74,13 +74,16 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
                        | {
                        |   "things": [
                        |     { "id": null },
-                       |     { "id": 22 }
+                       |     { "id": 22, "more": { "name": "Xx" } }
                        |   ]
                        | }
                      """.stripMargin).fold(throw _, x => x)
 
-    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(things: List[things])"),
-                                        ("things", "case class things(id: Option[Double])"))
+    jsonToCaseClass(json) shouldBe List(
+      ("CC", "case class CC(things: List[things])"),
+      ("things", "case class things(more: Option[more], id: Option[Double])"),
+      ("more", "case class more(name: String)")
+    )
   }
 
   it should "parse json empty lists" in {
@@ -94,32 +97,34 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
   }
 
   it should "parse json with nested objects in arrays" in {
-    val json = parse("""
+    val json =
+      parse("""
         |{  
         |  "hotels": { 
         |    "entities": [
-        |      { "id": "1aa4c4ad-f9ea-3367-a163-8a3a6884d450", "name": "Dana Beach Resort" }
+        |      { "id": "1aa4c4ad-f9ea-3367-a163-8a3a6884d450", "name": "Dana Beach Resort", "ids": [1,2,3] }
         |    ]
         |  }
         |}""".stripMargin)
-      .fold(throw _, x => x)
+        .fold(throw _, x => x)
 
     jsonToCaseClass(json) shouldBe List(
       ("CC", "case class CC(hotels: hotels)"),
       ("hotels", "case class hotels(entities: List[entities])"),
-      ("entities", "case class entities(id: String, name: String)")
+      ("entities", "case class entities(name: String, ids: List[Double], id: String)")
     )
   }
 
   it should "parse json with different types in objects in arrays making them optional" in {
     val json = parse("""
                        | {
-                       |   "list": [ { "id": 22 }, { "name": "Toben" } ]
+                       |   "list": [ { "id": 22, "other": 12 }, { "name": "Toben", "other": 12} ]
                        | }
                      """.stripMargin).fold(throw _, x => x)
 
-    jsonToCaseClass(json) shouldBe List(("CC", "case class CC(list: List[list])"),
-                                        ("list", "case class list(name: Option[String], id: Option[Double])"))
+    jsonToCaseClass(json) shouldBe List(
+      ("CC", "case class CC(list: List[list])"),
+      ("list", "case class list(other: Double, name: Option[String], id: Option[Double])"))
   }
 
   it should "parse json with different types in objects in arrays making only the always optional ones optional" in {
@@ -176,8 +181,7 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
     )
   }
 
-  //todo
-  ignore should "work for different types in an array" in {
+  it should "work for different types in an array" in {
     val json = parse("""
                        | {
                        |   "list": [ 22, "Hi", false ]
@@ -185,7 +189,7 @@ class jsonToCaseClassTest extends FlatSpec with Matchers {
                      """.stripMargin).fold(throw _, x => x)
 
     jsonToCaseClass(json) shouldBe List(
-      ("CC", "case class CC(list: List[Any])")
+      ("CC", "case class CC(list: List[Json])")
     )
   }
 }
