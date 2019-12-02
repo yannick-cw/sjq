@@ -38,7 +38,7 @@ object executeAccessPattern {
         .map { case (name, cc) => cc + s"\nscala.reflect.classTag[$name].runtimeClass" }
         .mkString("\n")
       code = buildCode(access, caseClassesWithReflection)
-      tree <- Try(tb.parse(code)).toEither
+      tree   <- Try(tb.parse(code)).toEither
       result <- Try(tb.eval(tree).asInstanceOf[Json => String](parsedJson)).toEither
     } yield result
   }
