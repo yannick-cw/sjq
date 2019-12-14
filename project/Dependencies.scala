@@ -5,7 +5,7 @@ object Versions {
   val caseApp       = "2.0.0-M9"
   val scalaTest     = "3.0.8"
   val scalaCompiler = "2.13.0"
-  val scalaCheck    = "1.14.0"
+  val scalaCheck    = "1.14.3"
 }
 
 object Dependencies {
