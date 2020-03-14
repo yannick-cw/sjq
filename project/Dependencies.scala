@@ -2,7 +2,7 @@ import sbt._
 
 object Versions {
   val circe         = "0.12.0-RC2"
-  val caseApp       = "2.0.0-M9"
+  val caseApp       = "2.0.0-M14"
   val scalaTest     = "3.0.8"
   val scalaCompiler = "2.13.0"
   val scalaCheck    = "1.14.0"
