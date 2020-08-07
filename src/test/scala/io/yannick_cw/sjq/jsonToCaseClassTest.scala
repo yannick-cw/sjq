@@ -1,9 +1,10 @@
 package io.yannick_cw.sjq
 
-import org.scalatest.{FlatSpec, Matchers}
 import io.circe.parser.parse
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class jsonToCaseClassTest extends FlatSpec with Matchers {
+class jsonToCaseClassTest extends AnyFlatSpec with Matchers {
 
   it should "parse json" in {
     val json = parse("""
