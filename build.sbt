@@ -2,11 +2,11 @@ import Dependencies._
 
 name := "sjq"
 
-organization in ThisBuild := "yannick-cw"
+(ThisBuild / organization) := "yannick-cw"
 maintainer := "yannick.gladow@gmail.com"
-scalaVersion in ThisBuild := "2.13.0"
-scalafmtVersion in ThisBuild := "1.2.0"
-scalafmtOnCompile in ThisBuild := true
+(ThisBuild / scalaVersion) := "2.13.0"
+(ThisBuild / scalafmtVersion) := "1.2.0"
+(ThisBuild / scalafmtOnCompile) := true
 
 lazy val cli = project
   .in(file("."))
